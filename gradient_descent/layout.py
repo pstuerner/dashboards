@@ -8,7 +8,8 @@ import plotly.graph_objects as go
 from sklearn.linear_model import LinearRegression
 from layouts import (
     example1_layout,
-    example2_layout
+    example2_layout,
+    example3_layout
 )
 
 m = 50
@@ -24,6 +25,7 @@ layout = dbc.Jumbotron(
     [
         example1_layout,
         example2_layout,
+        example3_layout,
 
         html.Div(pd.DataFrame(np.c_[np.ones(len(X)),X,y],columns=['b','X','y']).to_json(orient='split'), id='data', style={'display':'none'}),
         html.Div(pd.DataFrame(np.c_[np.ones(len(X)),(X - X.mean()) / X.std(),y],columns=['b','X','y']).to_json(orient='split'), id='data_scaled', style={'display':'none'}),

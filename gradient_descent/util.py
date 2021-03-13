@@ -1,3 +1,4 @@
+import numpy as np
 import dash_bootstrap_components as dbc
 
 external_scripts = [
@@ -11,3 +12,9 @@ external_stylesheets = [
     "/static/additional.css",
     "/static/stackoverflow-dark.css",
 ]
+
+m=50
+j = lambda X_b,y,theta0,theta1: 1/2*1/m*((X_b.dot(np.array([[theta0],[theta1]]))-y)**2).sum()
+djt0 = lambda X_b,y,theta0,theta1: 1/m*(X_b.dot(np.array([[theta0],[theta1]]))-y).sum()
+djt1 = lambda X_b,y,theta0,theta1: 1/m*((X_b.dot(np.array([[theta0],[theta1]]))-y)*X_b[:,1].reshape(-1,1)).sum()
+z = lambda theta0,theta1,theta0_touch,theta1_touch,X_b: djt0_new(X_b,theta0_touch,theta1_touch)*(theta0-theta0_touch)+djt1_new(X_b,theta0_touch,theta1_touch)*(theta1-theta1_touch)+j_new(X_b,theta0_touch,theta1_touch)

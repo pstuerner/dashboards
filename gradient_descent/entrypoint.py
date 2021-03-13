@@ -3,7 +3,7 @@ import dash_html_components as html
 
 from app import app
 from layout import layout
-from callbacks import example1, example2
+from callbacks import example1, example2, example3
 
 if __name__ == "__main__":
     app.layout = layout
