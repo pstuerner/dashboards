@@ -17,4 +17,4 @@ m=50
 j = lambda X_b,y,theta0,theta1: 1/2*1/m*((X_b.dot(np.array([[theta0],[theta1]]))-y)**2).sum()
 djt0 = lambda X_b,y,theta0,theta1: 1/m*(X_b.dot(np.array([[theta0],[theta1]]))-y).sum()
 djt1 = lambda X_b,y,theta0,theta1: 1/m*((X_b.dot(np.array([[theta0],[theta1]]))-y)*X_b[:,1].reshape(-1,1)).sum()
-z = lambda theta0,theta1,theta0_touch,theta1_touch,X_b: djt0_new(X_b,theta0_touch,theta1_touch)*(theta0-theta0_touch)+djt1_new(X_b,theta0_touch,theta1_touch)*(theta1-theta1_touch)+j_new(X_b,theta0_touch,theta1_touch)
+z = lambda theta0,theta1,theta0_touch,theta1_touch,X_b,y: djt0(X_b,y,theta0_touch,theta1_touch)*(theta0-theta0_touch)+djt1(X_b,y,theta0_touch,theta1_touch)*(theta1-theta1_touch)+j(X_b,y,theta0_touch,theta1_touch)
