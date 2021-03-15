@@ -10,11 +10,11 @@ from app import app
 
 @app.callback(Output('example2_p_theta0','children'),Input('example2_slider_theta0','value'))
 def p_theta0_example2(theta0):
-    return ['theta_0 = ',theta0]
+    return ['$\\theta_0=$',' ',theta0]
 
 @app.callback(Output('example2_p_theta1','children'),Input('example2_slider_theta1','value'))
 def p_theta1_example2(theta1):
-    return ['theta_1 = ',theta1]
+    return ['$\\theta_1=$',' ',theta1]
 
 @app.callback([Output('example2_slider_theta0','value'),Output('example2_slider_theta1','value')],[Input('example2_button_bestfit','n_clicks'),State('example2_slider_theta0','value'),State('example2_slider_theta1','value'),State('best_theta','children')])
 def best_fit_example2(n_clicks,theta0,theta1,best_theta):

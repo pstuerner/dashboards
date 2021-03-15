@@ -10,7 +10,7 @@ from app import app
 
 @app.callback(Output('example1_p_theta1','children'),Input('example1_slider_theta1','value'))
 def example1_p_theta0(theta1):
-    return ['theta_1 = ',theta1]
+    return ['$\\theta_1=$',' ',theta1]
 
 @app.callback(Output('example1_slider_theta1','value'),[Input('example1_button_bestfit','n_clicks'),State('example1_slider_theta1','value'),State('best_theta','children')])
 def best_fit_example1(n_clicks,theta1,best_theta):
