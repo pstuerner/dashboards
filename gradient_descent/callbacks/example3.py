@@ -1,6 +1,7 @@
 import dash
 import pandas as pd
 import numpy as np
+import random
 import plotly.graph_objects as go
 import dash_html_components as html
 
@@ -24,13 +25,13 @@ def example3_div_mse(theta1_init, theta1_hist, data, best_theta):
         
     return [html.H3('MSE'),f'{mse:.2f}']
     
-@app.callback(Output('example3_div_theta1init','children'),[Input('example3_button_reset','n_clicks')])
-def example3_theta1init(n_clicks):
+@app.callback(Output('example3_div_theta1init','children'),[Input('example3_button_reset','n_clicks'),Input('best_theta','children')])
+def example3_theta1init(n_clicks,best_theta):
     ctx = dash.callback_context
     
     if 'reset' in ctx.triggered[0]['prop_id']:
-        v = int(theta1_best)
-        while theta1_best+1.5>v>theta1_best-1.5:
+        v = best_theta[1]
+        while best_theta[1]+1.5>v>best_theta[1]-1.5:
             v = round(random.uniform(-1.5,7.5),2)
     else:
         v = 6
@@ -38,7 +39,8 @@ def example3_theta1init(n_clicks):
     return v
 
 @app.callback(
-    Output('example3_div_theta1hist','children'),
+    [Output('example3_div_theta1hist','children'),
+     Output('example3_div_thetas','children')],
     [Input('example3_button_nextstep','n_clicks'),
      Input('example3_div_theta1init','children'),
      State('example3_div_theta1hist','children'),
@@ -51,11 +53,11 @@ def example3_theta1hist(n_clicks,theta1_init,theta1_hist,eta,theta_best,data):
     ctx = dash.callback_context.triggered[0]['prop_id']
     
     if ctx == '.' or 'theta1init' in ctx:
-        return [theta1_init]
+        return [[theta1_init], ['$\\theta_0=$',' ',round(theta_best[0],1),', ','$\\theta_1=$',' ',round(theta1_init,1)]]
     else:
         gradient = djt1(df[['b','X']].to_numpy(),df[['y']].to_numpy(),theta_best[0],theta1_hist[-1])
         theta1_new = theta1_hist[-1] - eta * gradient
-        return theta1_hist+[theta1_new]
+        return [theta1_hist+[theta1_new], ['$\\theta_0=$',' ',round(theta_best[0],1),', ','$\\theta_1=$',' ',round(theta1_new,1)]]
 
 @app.callback(
     Output('example3_graph_regression', 'figure'),

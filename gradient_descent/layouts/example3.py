@@ -7,6 +7,7 @@ layout = html.Div([
         dbc.Col([
             html.Div([
                 html.Div(id='example3_div_mse', className='pb-2'),
+                html.Div(id='example3_div_thetas', className='pb-2'),
                 dbc.ButtonGroup([
                     dbc.Button(id='example3_button_nextstep', color='secondary', children='Next step'),
                     dbc.Button(id='example3_button_reset', color='secondary', children='Reset'),
