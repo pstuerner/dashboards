@@ -18,3 +18,32 @@ j = lambda X_b,y,theta0,theta1: 1/2*1/m*((X_b.dot(np.array([[theta0],[theta1]]))
 djt0 = lambda X_b,y,theta0,theta1: 1/m*(X_b.dot(np.array([[theta0],[theta1]]))-y).sum()
 djt1 = lambda X_b,y,theta0,theta1: 1/m*((X_b.dot(np.array([[theta0],[theta1]]))-y)*X_b[:,1].reshape(-1,1)).sum()
 z = lambda theta0,theta1,theta0_touch,theta1_touch,X_b,y: djt0(X_b,y,theta0_touch,theta1_touch)*(theta0-theta0_touch)+djt1(X_b,y,theta0_touch,theta1_touch)*(theta1-theta1_touch)+j(X_b,y,theta0_touch,theta1_touch)
+
+def array2matrix(arr, max_rows=5, max_cols=5):
+    rows = min(arr.shape[0], max_rows)
+    cols = min(arr.shape[1], max_cols)
+    if arr.shape[1] > cols:
+        rows_idx = (
+            [int(rows / 2)] if rows % 2 != 0 else [int(rows / 2), int(rows / 2 - 1)]
+        )
+    else:
+        rows_idx = []
+
+    bmatrix = "\\begin{pmatrix}"
+    for row in range(0, rows):
+        vdots = "&\\dots" if arr.shape[1] > cols and row in rows_idx else ""
+        bmatrix += "&".join(arr[row][:cols].round(2).astype(str)) + vdots + "\\\\"
+
+    if arr.shape[0] > rows:
+        dots = [""] * cols
+        if cols % 2 != 0:
+            dots[int(cols / 2)] = "\\vdots"
+        else:
+            dots[int(cols / 2)] = "\\vdots"
+            dots[int(cols / 2 - 1)] = "\\vdots"
+    else:
+        dots = [""]
+    dots = "&".join(dots)
+    bmatrix = bmatrix + dots + "\\end{pmatrix}"
+
+    return bmatrix
