@@ -7,16 +7,17 @@ import plotly.graph_objects as go
 
 from sklearn.linear_model import LinearRegression
 from layouts import (
-    example1_layout,
+    introduction,
+    section1_layout,
     example2_layout,
     example3_layout,
-    example4_layout
+    example4_layout,
+    toc
 )
 
-m = 50
-X = 2 * np.random.rand(m, 1)
-X_b = np.c_[np.ones(len(X)),X]
-y = 4 + 3 * X + np.random.randn(m, 1)
+X = np.load('X.npy') #= 2 * np.random.rand(m, 1)
+y = np.load('y.npy') #= 4 + 3 * X + np.random.randn(m, 1)
+m = len(X)
 
 lr = LinearRegression()
 lr.fit(X,y)
@@ -24,9 +25,10 @@ theta0_best, theta1_best = lr.intercept_[0], lr.coef_[0][0]
 
 layout = dbc.Jumbotron(
     [
-        example1_layout,
+        introduction,
+        toc,
+        section1_layout,
         example2_layout,
-        example3_layout,
         example4_layout,
 
         html.Div(pd.DataFrame(np.c_[np.ones(len(X)),X,y],columns=['b','X','y']).to_json(orient='split'), id='data', style={'display':'none'}),
