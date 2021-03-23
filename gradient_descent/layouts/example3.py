@@ -22,6 +22,10 @@ layout = html.Div([
             html.Div(dcc.Graph(id='example3_graph_lossfunction')),
         ], xs=12, sm=12, md=12, lg=5),
     ]),
+    dbc.Col([
+        dbc.Table(id='example3_table_math', bordered=False),
+    ], xs=12, sm=12, md=12, lg=6, style={'margin-left':'auto', 'margin-right':'auto', 'overflow-x':'scroll'}),
+    html.Div(dbc.Button(id='example3_button_nextstep_table', color='secondary', children='Next step'), className='pt-1 pb-2', style={'text-align':'center'}),
     html.Div(id='example3_div_theta1init', style={'display': 'none'}),
     html.Div(id='example3_div_theta1hist', style={'display': 'none'}),
 ])
