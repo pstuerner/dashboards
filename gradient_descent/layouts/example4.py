@@ -16,7 +16,6 @@ layout = html.Div([
                         value=[],
                         id="example4_checklist_scalex",
                         switch=True,
-                        #inline=True,
                     ), style={'width':'100%'}, className='pb-2',
                 ),
                 dbc.ButtonGroup([
@@ -33,6 +32,10 @@ layout = html.Div([
             html.Div(dcc.Graph(id='example4_graph_lossfunction')),
         ], xs=12, sm=12, md=12, lg=5),
     ]),
+    dbc.Col([
+        dbc.Table(id='example4_table_math', bordered=False),
+    ], xs=12, sm=12, md=12, lg=6, style={'margin-left':'auto', 'margin-right':'auto', 'overflow-x':'scroll'}),
+    html.Div(dbc.Button(id='example4_button_nextstep_table', color='secondary', children='Next step'), className='pt-1 pb-2', style={'text-align':'center'}),
     html.Div(id='example4_div_thetainit', style={'display': 'none'}),
     html.Div(id='example4_div_thetahist', style={'display': 'none'}),
 ])

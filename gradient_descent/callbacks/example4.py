@@ -8,7 +8,7 @@ import dash_html_components as html
 
 from sklearn.metrics import mean_squared_error
 from dash.dependencies import Input, Output, State
-from util import j, djt0, djt1, z
+from util import j, djt0, djt1, z, array2matrix
 from app import app
 
 
@@ -60,9 +60,24 @@ def example4_thetainit(n_clicks, scalex):
     return [theta0_init, theta1_init]
 
 @app.callback(
+    Output('example4_input_eta','disabled'),
+    [Input('example4_button_reset','n_clicks'),
+     Input('example4_button_nextstep','n_clicks'),
+     Input('example4_button_nextstep_table','n_clicks')]
+)
+def example3_input_eta(reset,nextstep,nextstep_table):
+    ctx = dash.callback_context.triggered[0]['prop_id']
+    
+    if 'reset' in ctx or all(v is None for v in [nextstep,nextstep_table]):
+        return False
+    else:
+        return True
+
+@app.callback(
     [Output('example4_div_thetahist','children'),
      Output('example4_div_thetas','children')],
     [Input('example4_button_nextstep','n_clicks'),
+     Input('example4_button_nextstep_table','n_clicks'),
      Input('example4_div_thetainit','children'),
      State('example4_checklist_scalex','value'),
      State('example4_div_thetahist','children'),
@@ -70,7 +85,7 @@ def example4_thetainit(n_clicks, scalex):
      State('data','children'),
      State('data_scaled','children')]
 )
-def example4_thetahist(n_clicks,theta_init,scalex,theta_hist,eta,data,data_scaled):
+def example4_thetahist(n_clicks,n_clicks_table,theta_init,scalex,theta_hist,eta,data,data_scaled):
     ctx = dash.callback_context.triggered[0]['prop_id']
     
     if ctx == '.' or 'thetainit' in ctx:
@@ -93,6 +108,65 @@ def example4_thetahist(n_clicks,theta_init,scalex,theta_hist,eta,data,data_scale
         df_theta = df_theta.append({'theta0':theta0_new,'theta1':theta1_new}, ignore_index=True)
 
         return [df_theta.to_json(orient='split'), ['$\\theta_0=$',' ',round(theta0_new,1),', ','$\\theta_1=$',' ',round(theta1_new,1)]]
+
+@app.callback(
+    Output('example4_table_math','children'),
+    [Input('example4_div_thetahist','children'),
+     Input('example4_input_eta','value'),
+     State('example4_table_math','children'),
+     State('example4_checklist_scalex','value'),
+     State('data','children'),
+     State('data_scaled','children')]
+)
+def example4_table_math(thetahist, eta, table, scalex, data, data_scaled):
+    if scalex != []:
+        df = pd.read_json(data_scaled, orient='split')
+    else:
+        df = pd.read_json(data, orient='split')
+    df_theta = pd.read_json(thetahist, orient='split')
+    theta0, theta1 = [round(x,2) for x in df_theta.values[-1]]
+    theta = np.array([[theta0],[theta1]])
+    td_style = {'text-align':'center','vertical-align':'middle','font-weight':'bold'}
+    if len(df_theta)==1:
+        trs = [
+            html.Tr([
+                html.Td('Parameters', style=td_style),
+                html.Td(f'$$\\theta=\\begin{{pmatrix}}\\theta_0\\\\\\theta_1\\end{{pmatrix}}$$$$\\eta={eta}$$')
+            ]),
+            html.Tr([
+                html.Td('Cost function', style=td_style),
+                html.Td(f'$$\\begin{{aligned}}\\textrm{{MSE}}(\\theta)&=\\frac{{1}}{{2m}}\\sum_{{i=1}}^{{m}}(\\theta^{{T}}x^{{i}}-y^{{i}})^{{2}}\\\\&=\\frac{{1}}{{2m}}\\sum_{{i=1}}^{{m}}(\\begin{{pmatrix}}{theta0}&\\theta_{{1}}\\end{{pmatrix}}x^{{i}}-y^{{i}})^{{2}}\\end{{aligned}}$$')
+            ]),
+            html.Tr([
+                html.Td('Gradient', style=td_style),
+                html.Td(f'$$\\begin{{aligned}}\\textrm{{MSE}}_{{\\theta_0}}(\\theta)&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\theta^{{T}}x^{{i}}-y^{{i}})x_{{1}}^{{i}}\\\\&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\begin{{pmatrix}}{theta0}&\\theta_{{1}}\\end{{pmatrix}}x^{{i}}-y^{{i}})\\end{{aligned}}$$$$\\begin{{aligned}}\\textrm{{MSE}}_{{\\theta_1}}(\\theta)&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\theta^{{T}}x^{{i}}-y^{{i}})x_{{1}}^{{i}}\\\\&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\begin{{pmatrix}}{theta0}&\\theta_{{1}}\\end{{pmatrix}}x^{{i}}-y^{{i}})x_{{1}}^{{i}}\\end{{aligned}}$$')
+            ]),
+            html.Tr([
+                html.Td('Initialization', style=td_style),
+                html.Td([
+                    f'$$\\theta={array2matrix(theta)}$$',
+                    ])
+            ])
+        ]
+        return html.Tbody(trs, className='math-left-align')
+    else:
+        theta0_old, theta1_old = [round(x,2) for x in df_theta.values[-2]]
+        gradient0 = djt0(df[['b','X']].to_numpy(),df[['y']].to_numpy(),theta0_old,theta1_old)
+        gradient1 = djt1(df[['b','X']].to_numpy(),df[['y']].to_numpy(),theta0_old,theta1_old)
+        trs = table['props']['children']
+        tr = html.Tr(
+            [
+                html.Td(f'Step {len(df_theta)-1}', style=td_style),
+                html.Td([
+                    f'$$\\textrm{{MSE}}_{{\\theta_0}}(\\theta)=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}({array2matrix(theta.T)}x^{{i}}-y^{{i}})={round(gradient0,2)}$$',
+                    f'$$\\textrm{{MSE}}_{{\\theta_1}}(\\theta)=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}({array2matrix(theta.T)}x^{{i}}-y^{{i}})x_{{1}}^{{i}}={round(gradient1,2)}$$',
+                    f'$$\\theta_{{0}}^{{new}}=\\theta_0-\\eta\\textrm{{MSE}}_{{\\theta_0}}(\\theta)={theta0_old}-{eta}\\cdot{round(gradient0,2)}={theta0}$$',
+                    f'$$\\theta_{{1}}^{{new}}=\\theta_1-\\eta\\textrm{{MSE}}_{{\\theta_1}}(\\theta)={theta1_old}-{eta}\\cdot{round(gradient1,2)}={theta1}$$',
+                    f'$$\\theta={array2matrix(np.array([[theta0],[theta1]]))}$$'
+                
+                ])
+            ])
+        return html.Tbody(trs+[tr], className='math-left-align')
 
 @app.callback(
     Output('example4_graph_regression', 'figure'),
@@ -136,7 +210,7 @@ def example4_regression(theta_init, theta_hist, scalex, fig, data, data_scaled):
                         zerolinecolor="lightgrey",
                         gridcolor="lightgrey",
                         title='X',
-                        range = [0,df['X'].max()*1.1]
+                        range = [df['X'].min()-df['X'].max()*0.1,df['X'].max()*1.1]
                     ),
                     margin=dict(t=5,b=5,l=5,r=5),
                     paper_bgcolor="rgba(0,0,0,0)",
