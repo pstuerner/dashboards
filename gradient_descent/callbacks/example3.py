@@ -8,7 +8,7 @@ import dash_bootstrap_components as dbc
 
 from sklearn.metrics import mean_squared_error
 from dash.dependencies import Input, Output, State
-from util import j, djt1, array2matrix, t0, t1
+from util import j, djt1, array2matrix
 from app import app
 
 
