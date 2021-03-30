@@ -12,8 +12,6 @@ from layouts import (
     section2_layout,
     section3_layout,
     section4_layout,
-    example3_layout,
-    example4_layout,
     toc,
     wrapup
 )
