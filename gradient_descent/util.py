@@ -1,6 +1,8 @@
 import numpy as np
 import dash_bootstrap_components as dbc
 
+from sklearn.linear_model import LinearRegression
+
 external_scripts = [
     "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML",
     "/static/additional.js",
@@ -13,7 +15,14 @@ external_stylesheets = [
     "/static/stackoverflow-dark.css",
 ]
 
-m=50
+X = np.load('X.npy') #= 2 * np.random.rand(m, 1)
+y = np.load('y.npy') #= 4 + 3 * X + np.random.randn(m, 1)
+m = len(X)
+
+lr = LinearRegression()
+lr.fit(X,y)
+theta0_best, theta1_best = lr.intercept_[0], lr.coef_[0][0]
+
 j = lambda X_b,y,theta0,theta1: 1/2*1/m*((X_b.dot(np.array([[theta0],[theta1]]))-y)**2).sum()
 djt0 = lambda X_b,y,theta0,theta1: 1/m*(X_b.dot(np.array([[theta0],[theta1]]))-y).sum()
 djt1 = lambda X_b,y,theta0,theta1: 1/m*((X_b.dot(np.array([[theta0],[theta1]]))-y)*X_b[:,1].reshape(-1,1)).sum()
