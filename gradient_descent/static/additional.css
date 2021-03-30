@@ -1,11 +1,13 @@
-.bs-component {
-    margin-top:3rem;
-    text-align: justify;
-    text-justify: inter-word;
-   }
+b {
+    font-weight: bold;
+}
 
-.bs-component + .bs-component {
-margin-top:3rem;
+.table td {
+    vertical-align: middle;
+}
+
+.table th {
+    text-align: center;
 }
 
 #toc_container {
@@ -53,13 +55,17 @@ margin-top:3rem;
 }
 
 .bs-component {
-    margin-top:3rem;
+    margin-bottom:3rem;
     text-align: justify;
     text-justify: inter-word;
    }
 
 .bs-component + .bs-component {
-margin-top:3rem;
+    margin-top:0rem;
+}
+
+.jumbotron {
+    padding: 2rem 1rem;
 }
 
 .no-padding td {
@@ -83,4 +89,8 @@ code {
 
 body {
     padding-top: 0px;
+}
+
+h1, h2, h3 {
+    text-align: center;
 }
