@@ -36,7 +36,7 @@ def example4_div_mse(theta_init, theta_hist, scalex, data, data_scaled):
         df_theta = pd.read_json(theta_hist, orient='split')
         theta0, theta1 = df_theta.values[-1]
         
-        if scalex != []:
+        if scalex == [1]:
             df = pd.read_json(data_scaled, orient='split')
         else:
             df = pd.read_json(data, orient='split')
@@ -45,11 +45,24 @@ def example4_div_mse(theta_init, theta_hist, scalex, data, data_scaled):
         
     return [html.H3('MSE'),f'{mse:.2f}']
 
-@app.callback(Output('example4_div_thetainit','children'),[Input('example4_button_reset','n_clicks'),Input('example4_checklist_scalex','value')])
-def example4_thetainit(n_clicks, scalex):
-    ctx = dash.callback_context
+@app.callback(
+    [Output('example4_div_thetainit','children'),
+    Output('example4_checklist_scalex','value'),
+    Output('example4_input_eta','value')],
+    [Input('example4_button_reset','n_clicks'),
+     Input('example4_href_li1','n_clicks'),
+     Input('example4_href_li2','n_clicks'),
+     Input('example4_checklist_scalex','value'),
+     State('example4_input_eta','value')]
+)
+def example4_thetainit(n_clicks, li1, li2, scalex, eta):
+    ctx = dash.callback_context.triggered[0]['prop_id']
     
-    if 'reset' in ctx.triggered[0]['prop_id'] or scalex != []:
+    if 'li1' in ctx:
+        return [[15,-15],[],0.5]
+    elif 'li2' in ctx:
+        return [[15,-15],[1],0.5]
+    elif 'reset' in ctx or scalex == [1]:
         theta0_init, theta1_init = 0, 0
         while 10>theta0_init>-10 or 10>theta1_init>-10:
             theta0_init = round(random.uniform(-20,20),2)
@@ -57,18 +70,19 @@ def example4_thetainit(n_clicks, scalex):
     else:
         theta0_init, theta1_init = -10, -10
                 
-    return [theta0_init, theta1_init]
+    return [[theta0_init, theta1_init],scalex,eta]
 
 @app.callback(
     Output('example4_input_eta','disabled'),
     [Input('example4_button_reset','n_clicks'),
      Input('example4_button_nextstep','n_clicks'),
-     Input('example4_button_nextstep_table','n_clicks')]
+     Input('example4_button_nextstep_table','n_clicks'),
+     Input('example4_checklist_scalex','value')]
 )
-def example3_input_eta(reset,nextstep,nextstep_table):
+def example3_input_eta(reset,nextstep,nextstep_table,scalex):
     ctx = dash.callback_context.triggered[0]['prop_id']
     
-    if 'reset' in ctx or all(v is None for v in [nextstep,nextstep_table]):
+    if any(sub in ctx for sub in ['reset','scalex']) or all(v is None for v in [nextstep,nextstep_table]):
         return False
     else:
         return True
@@ -96,7 +110,7 @@ def example4_thetahist(n_clicks,n_clicks_table,theta_init,scalex,theta_hist,eta,
         df_theta = pd.read_json(theta_hist, orient='split')
         theta0, theta1 = df_theta.values[-1]
         
-        if scalex != []:
+        if scalex == [1]:
             df = pd.read_json(data_scaled, orient='split')
         else:
             df = pd.read_json(data, orient='split')
@@ -119,7 +133,7 @@ def example4_thetahist(n_clicks,n_clicks_table,theta_init,scalex,theta_hist,eta,
      State('data_scaled','children')]
 )
 def example4_table_math(thetahist, eta, table, scalex, data, data_scaled):
-    if scalex != []:
+    if scalex == [1]:
         df = pd.read_json(data_scaled, orient='split')
     else:
         df = pd.read_json(data, orient='split')
@@ -135,11 +149,11 @@ def example4_table_math(thetahist, eta, table, scalex, data, data_scaled):
             ]),
             html.Tr([
                 html.Td('Cost function', style=td_style),
-                html.Td(f'$$\\begin{{aligned}}\\textrm{{MSE}}(\\theta)&=\\frac{{1}}{{2m}}\\sum_{{i=1}}^{{m}}(\\theta^{{T}}x^{{i}}-y^{{i}})^{{2}}\\\\&=\\frac{{1}}{{2m}}\\sum_{{i=1}}^{{m}}(\\begin{{pmatrix}}{theta0}&\\theta_{{1}}\\end{{pmatrix}}x^{{i}}-y^{{i}})^{{2}}\\end{{aligned}}$$')
+                html.Td(f'$$\\begin{{aligned}}\\textrm{{MSE}}(\\theta)&=\\frac{{1}}{{2m}}\\sum_{{i=1}}^{{m}}(\\theta^{{T}}x^{{i}}-y^{{i}})^{{2}}\\\\&=\\frac{{1}}{{2m}}\\sum_{{i=1}}^{{m}}(\\begin{{pmatrix}}\\theta_{{0}}&\\theta_{{1}}\\end{{pmatrix}}x^{{i}}-y^{{i}})^{{2}}\\end{{aligned}}$$')
             ]),
             html.Tr([
                 html.Td('Gradient', style=td_style),
-                html.Td(f'$$\\begin{{aligned}}\\textrm{{MSE}}_{{\\theta_0}}(\\theta)&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\theta^{{T}}x^{{i}}-y^{{i}})x_{{1}}^{{i}}\\\\&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\begin{{pmatrix}}{theta0}&\\theta_{{1}}\\end{{pmatrix}}x^{{i}}-y^{{i}})\\end{{aligned}}$$$$\\begin{{aligned}}\\textrm{{MSE}}_{{\\theta_1}}(\\theta)&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\theta^{{T}}x^{{i}}-y^{{i}})x_{{1}}^{{i}}\\\\&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\begin{{pmatrix}}{theta0}&\\theta_{{1}}\\end{{pmatrix}}x^{{i}}-y^{{i}})x_{{1}}^{{i}}\\end{{aligned}}$$')
+                html.Td(f'$$\\begin{{aligned}}\\textrm{{MSE}}_{{\\theta_0}}(\\theta)&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\theta^{{T}}x^{{i}}-y^{{i}})x_{{0}}^{{i}}\\\\&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\begin{{pmatrix}}\\theta_{{0}}&\\theta_{{1}}\\end{{pmatrix}}x^{{i}}-y^{{i}})x_{{0}}^{{i}}\\end{{aligned}}$$$$\\begin{{aligned}}\\textrm{{MSE}}_{{\\theta_1}}(\\theta)&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\theta^{{T}}x^{{i}}-y^{{i}})x_{{1}}^{{i}}\\\\&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\begin{{pmatrix}}\\theta_{{0}}&\\theta_{{1}}\\end{{pmatrix}}x^{{i}}-y^{{i}})x_{{1}}^{{i}}\\end{{aligned}}$$')
             ]),
             html.Tr([
                 html.Td('Initialization', style=td_style),
@@ -151,6 +165,7 @@ def example4_table_math(thetahist, eta, table, scalex, data, data_scaled):
         return html.Tbody(trs, className='math-left-align')
     else:
         theta0_old, theta1_old = [round(x,2) for x in df_theta.values[-2]]
+        theta_old = np.array([[theta0_old],[theta1_old]])
         gradient0 = djt0(df[['b','X']].to_numpy(),df[['y']].to_numpy(),theta0_old,theta1_old)
         gradient1 = djt1(df[['b','X']].to_numpy(),df[['y']].to_numpy(),theta0_old,theta1_old)
         trs = table['props']['children']
@@ -158,12 +173,11 @@ def example4_table_math(thetahist, eta, table, scalex, data, data_scaled):
             [
                 html.Td(f'Step {len(df_theta)-1}', style=td_style),
                 html.Td([
-                    f'$$\\textrm{{MSE}}_{{\\theta_0}}(\\theta)=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}({array2matrix(theta.T)}x^{{i}}-y^{{i}})={round(gradient0,2)}$$',
-                    f'$$\\textrm{{MSE}}_{{\\theta_1}}(\\theta)=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}({array2matrix(theta.T)}x^{{i}}-y^{{i}})x_{{1}}^{{i}}={round(gradient1,2)}$$',
+                    f'$$\\textrm{{MSE}}_{{\\theta_0}}(\\theta)=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}({array2matrix(theta_old.T)}x^{{i}}-y^{{i}})x_{{0}}^{{i}}={round(gradient0,2)}$$',
+                    f'$$\\textrm{{MSE}}_{{\\theta_1}}(\\theta)=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}({array2matrix(theta_old.T)}x^{{i}}-y^{{i}})x_{{1}}^{{i}}={round(gradient1,2)}$$',
                     f'$$\\theta_{{0}}^{{new}}=\\theta_0-\\eta\\textrm{{MSE}}_{{\\theta_0}}(\\theta)={theta0_old}-{eta}\\cdot{round(gradient0,2)}={theta0}$$',
                     f'$$\\theta_{{1}}^{{new}}=\\theta_1-\\eta\\textrm{{MSE}}_{{\\theta_1}}(\\theta)={theta1_old}-{eta}\\cdot{round(gradient1,2)}={theta1}$$',
-                    f'$$\\theta={array2matrix(np.array([[theta0],[theta1]]))}$$'
-                
+                    f'$$\\theta={array2matrix(theta)}$$'
                 ])
             ])
         return html.Tbody(trs+[tr], className='math-left-align')
@@ -180,7 +194,7 @@ def example4_table_math(thetahist, eta, table, scalex, data, data_scaled):
 def example4_regression(theta_init, theta_hist, scalex, fig, data, data_scaled):
     ctx = dash.callback_context.triggered[0]['prop_id']
     
-    if scalex != []:
+    if scalex == [1]:
         df = pd.read_json(data_scaled, orient='split')
     else:
         df = pd.read_json(data, orient='split')
@@ -249,7 +263,7 @@ def example4_regression(theta_init, theta_hist, scalex, fig, data, data_scaled):
 def example4_lossfunction(theta_init, theta_hist, scalex, fig, data, data_scaled):
     ctx = dash.callback_context.triggered[0]['prop_id']
     
-    if scalex != []:
+    if scalex == [1]:
         df = pd.read_json(data_scaled, orient='split')
     else:
         df = pd.read_json(data, orient='split')
@@ -326,10 +340,10 @@ def example4_lossfunction(theta_init, theta_hist, scalex, fig, data, data_scaled
                     title='MSE Cost',
                     range=[-150,600]
                 ),
-                bgcolor="rgba(0,0,0,0)",
+                bgcolor='rgb(247, 247, 249)',
             ),
             uirevision=True,
-            margin=dict(t=5,b=5,l=5,r=5),
+            margin=dict(t=0,b=0,l=0,r=0),
         )
     else:
         figure = go.Figure(data=fig['data'], layout=fig['layout'])
@@ -386,5 +400,5 @@ def example4_lossfunction(theta_init, theta_hist, scalex, fig, data, data_scaled
             hoverinfo='skip'
         )
     )
-    
+
     return figure
