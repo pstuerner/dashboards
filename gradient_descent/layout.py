@@ -5,36 +5,37 @@ import dash_bootstrap_components as dbc
 import dash_html_components as html
 import plotly.graph_objects as go
 
-from sklearn.linear_model import LinearRegression
+from util import X,y,m,theta0_best,theta1_best
 from layouts import (
     introduction,
     section1_layout,
-    example2_layout,
+    section2_layout,
+    section3_layout,
+    section4_layout,
     example3_layout,
     example4_layout,
     toc
 )
-
-X = np.load('X.npy') #= 2 * np.random.rand(m, 1)
-y = np.load('y.npy') #= 4 + 3 * X + np.random.randn(m, 1)
-m = len(X)
-
-lr = LinearRegression()
-lr.fit(X,y)
-theta0_best, theta1_best = lr.intercept_[0], lr.coef_[0][0]
 
 layout = dbc.Jumbotron(
     [
         introduction,
         toc,
         section1_layout,
-        example2_layout,
-        example4_layout,
+        section2_layout,
+        section3_layout,
+        section4_layout,
 
         html.Div(pd.DataFrame(np.c_[np.ones(len(X)),X,y],columns=['b','X','y']).to_json(orient='split'), id='data', style={'display':'none'}),
         html.Div(pd.DataFrame(np.c_[np.ones(len(X)),(X - X.mean()) / X.std(),y],columns=['b','X','y']).to_json(orient='split'), id='data_scaled', style={'display':'none'}),
-        html.Div([theta0_best,theta1_best], id='best_theta', style={'display':'none'})
+        html.Div([theta0_best,theta1_best], id='best_theta', style={'display':'none'}),
+        html.Div(id='data_racetrack', style={'display':'none'}),
+        html.Div(id='data_contour', style={'display':'none'}),
+        html.Div(id='best_theta_racetrack', style={'display':'none'}),
+        html.Div(id='racetrack_time', style={'display':'none'}),
+        html.Div([], id='bgd_history', style={'display':'none'}),
+        html.Div([], id='sgd_history', style={'display':'none'}),
+        html.Div([], id='mbgd_history', style={'display':'none'}),
     ],
     className="col-12",
-    style={"padding": "2rem 2rem"},
 )
