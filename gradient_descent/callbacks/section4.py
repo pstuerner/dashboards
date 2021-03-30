@@ -484,28 +484,42 @@ def update_trs(bgd_history, sgd_history, mbgd_history, size, data):
         Input('racetrack_dropdown_size','value'),
         Input('racetrack_button_nextstep','n_clicks'),
         Input('racetrack_button_reset','n_clicks'),
+        Input('racetrack_href_li1_1','n_clicks'),
+        Input('racetrack_href_li1_2','n_clicks'),
+        Input('racetrack_href_li2_1','n_clicks'),
+        Input('racetrack_href_li2_2','n_clicks'),
         State('mbgd_batchsize_td','children')
     ]
 )
-def update_mbgd_batchsize(size, nextstep, reset, mbgd_batchsize_td):
+def update_mbgd_batchsize(size, nextstep, reset, li1_1, li1_2, li2_1, li2_2, mbgd_batchsize_td):
     ctx = dash.callback_context.triggered[0]['prop_id']
-    
-    if ctx=='.' or 'reset' in ctx or 'size' in ctx:
+
+    def create_dropdown(size, value):
         return dcc.Dropdown(
-            id='mbgd_batchsize',
-            options=[
-                {'label':1, 'value':1},
-                {'label':size*0.02, 'value':size*0.02},
-                {'label':size*0.2, 'value':size*0.2},
-                {'label':size*0.5, 'value':size*0.5},
-                {'label':size*0.7, 'value':size*0.7},
-                {'label':size, 'value':size},
-            ],
-            value=size*0.02,
-            disabled=False,
-            clearable=False,
-            searchable=False,
-        )
+                id='mbgd_batchsize',
+                options=[
+                    {'label':1, 'value':1},
+                    {'label':size*0.02, 'value':size*0.02},
+                    {'label':size*0.2, 'value':size*0.2},
+                    {'label':size*0.5, 'value':size*0.5},
+                    {'label':size*0.7, 'value':size*0.7},
+                    {'label':size, 'value':size},
+                ],
+                value=value,
+                disabled=False,
+                clearable=False,
+                searchable=False,
+            )
+    
+
+    if ctx=='.' or 'reset' in ctx or 'size' in ctx:
+        return create_dropdown(size,size*0.2)
+    elif 'li1_1' in ctx:
+        return create_dropdown(10000,200)
+    elif 'li2_1' in ctx:
+        return create_dropdown(100,2)
+    elif 'li2_2' in ctx or 'li1_2' in ctx:
+        return create_dropdown(100,70)
     else:
         mbgd_batchsize_td['props']['disabled'] = True
         return mbgd_batchsize_td
@@ -529,3 +543,35 @@ def disable_options(nextstep, reset):
         return [False,False,False,False]
     else:
         return [True,True,True,True]
+
+@app.callback(
+    [
+        Output('racetrack_dropdown_size','value'),
+        Output('racetrack_input_steps','value'),
+        Output('bgd_lr_dropdown','value'),
+        Output('sgd_lr_dropdown','value'),
+        Output('mbgd_lr_dropdown','value'),
+    ],
+    [
+        Input('racetrack_href_li1_1','n_clicks'),
+        Input('racetrack_href_li1_2','n_clicks'),
+        Input('racetrack_href_li2_1','n_clicks'),
+        Input('racetrack_href_li2_2','n_clicks'),
+        State('racetrack_dropdown_size','value'),
+        State('racetrack_input_steps','value'),
+        State('bgd_lr_dropdown','value'),
+        State('sgd_lr_dropdown','value'),
+        State('mbgd_lr_dropdown','value'),
+    ]
+)
+def hrefs(li1_1, li1_2, li2_1, li2_2, racetrack_dropdown_size, racetrack_input_steps, bgd_lr_dropdown, sgd_lr_dropdown, mbgd_lr_dropdown):
+    ctx = dash.callback_context.triggered[0]['prop_id']
+    
+    if 'li1_1' in ctx:
+        return [10000,5,'constant','time','time']
+    elif 'li2_1' in ctx:
+        return [100,5,'constant','time','time']
+    elif 'li2_2' in ctx or 'li1_2' in ctx:
+        return [100,5,'constant','time','time']
+    else:
+        return [racetrack_dropdown_size, racetrack_input_steps, bgd_lr_dropdown, sgd_lr_dropdown, mbgd_lr_dropdown]

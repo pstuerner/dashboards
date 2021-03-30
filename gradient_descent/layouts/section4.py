@@ -134,4 +134,32 @@ section4_layout = html.Div([
             ], xs=12, sm=12, md=12, lg=12),
         ]),
     ], xs=12, sm=12, md=12, lg=12, className='bs-component center'), 
+    dbc.Col([
+        html.Ul([
+            html.Li([
+                html.A('What we would expect', href="#interactive4", id="racetrack_href_li1_1", style={"color": "blue", "font-weight": "bold",}),
+                html.P([
+                    "After a few Gradient Descent iterations, you'll notice that this setting reflects a situation we would expect from the three different algorithms. Batch Gradient Descent moves very goal-oriented towards the optimal solution. However, since the entire training data set, all 10000 instances, must be processed at each step, the average computation time is multiple times greater. Feel free to try around, in my case the computation time for Batch Gradient Descent is sometimes a factor of 30 to 40 larger. Of course, the factor depends on the size of the data set. If you ",
+                    html.A('reduce the dataset', href="#interactive4", id="racetrack_href_li1_2", style={"color": "blue", "font-weight": "bold",}),
+                    " to 100 instances there is no real difference in computation time. Interestingly, Batch Gradient Descent is even faster in this case, since the other two algorithms are busy with additional steps (generate random number, indexing)."
+                ]),
+                html.P("""
+                Stochastic Gradient Descent acts much more jumpy. Due to the random character of the algorithm, the line on the cost function jumps back and forth. At the beginning this is reflected in comparably worse MSE results, but after several hundreds or thousands of iterations and continuous reduction of the learning rate the problem becomes less severe and Stochastic Gradient Descent also approaches the global optimum.
+                """),
+                html.P("""
+                Mini-Batch Gradient Descent is very similar to Batch Gradient Descent, which is great because the performance is more or less the same with significantly reduced computation time.
+                """)
+            ]),
+            html.Li([
+                html.P("Mini-Batch Gradient Descent's batch size"),
+                html.P([
+                    'Mini-Batch Gradient Descent depends heavily on the batch size. ',
+                    html.A('In this example', href="#interactive4", id="racetrack_href_li2_1", style={"color": "blue", "font-weight": "bold",}),
+                    ', the algorithm behaves like Stochastic Gradient Descent. ',
+                    html.A('In this example', href="#interactive4", id="racetrack_href_li2_2", style={"color": "blue", "font-weight": "bold",}),
+                    ', the algorithm is almost identical to Batch Gradient Descent. It holds that smaller batch sizes push the algorithm towards Stochastic Gradient Descent and larger batch sizes push it towards Batch Gradient Descent. In the extreme cases, i.e. Batch Size=1 and Batch Size=m, Mini-batch Gradient Descent equals Stochastic and Batch Gradient Descent, respectively.'
+                ])
+            ]),
+        ]),
+    ], xs=12, sm=12, md=12, lg=8, className='bs-component center'), 
 ])
