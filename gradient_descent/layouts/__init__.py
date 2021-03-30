@@ -6,3 +6,4 @@ from .example3 import layout as example3_layout
 from .example4 import layout as example4_layout
 from .toc import toc
 from .introduction import introduction
+from .wrapup import wrapup

@@ -15,5 +15,6 @@ toc = dbc.Col([
             ])
         ]),
         html.Li(html.A('Gradient Descent Racetrack', href='#gradient_descent_racetrack')),
+        html.Li(html.A('Wrap-up', href='#wrap_up')),
     ])
 ], xs=12, sm=12, md=12, lg=8, className='bs-component center')

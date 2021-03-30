@@ -14,7 +14,8 @@ from layouts import (
     section4_layout,
     example3_layout,
     example4_layout,
-    toc
+    toc,
+    wrapup
 )
 
 layout = dbc.Jumbotron(
@@ -25,6 +26,7 @@ layout = dbc.Jumbotron(
         section2_layout,
         section3_layout,
         section4_layout,
+        wrapup,
 
         html.Div(pd.DataFrame(np.c_[np.ones(len(X)),X,y],columns=['b','X','y']).to_json(orient='split'), id='data', style={'display':'none'}),
         html.Div(pd.DataFrame(np.c_[np.ones(len(X)),(X - X.mean()) / X.std(),y],columns=['b','X','y']).to_json(orient='split'), id='data_scaled', style={'display':'none'}),
