@@ -12,8 +12,96 @@ from util import j, djt1, array2matrix
 from app import app
 
 
-@app.callback(Output('example3_div_mse','children'),[Input('example3_div_theta1init','children'),Input('example3_div_theta1hist','children'), State('data','children'), State('best_theta','children')])
-def example3_div_mse(theta1_init, theta1_hist, data, best_theta):
+@app.callback(Output('dashboard1_p_theta1','children'),Input('dashboard1_slider_theta1','value'))
+def dashboard1_p_theta0(theta1):
+    return ['$\\theta_1=$',' ',theta1]
+
+@app.callback(Output('dashboard1_slider_theta1','value'),[Input('dashboard1_button_bestfit','n_clicks'),State('dashboard1_slider_theta1','value'),State('best_theta','children')])
+def best_fit_dashboard1(n_clicks,theta1,best_theta):
+    ctx = dash.callback_context.triggered[0]['prop_id']
+    
+    if ctx == '.':
+        return theta1
+    else:
+        return round(best_theta[1],1)
+
+@app.callback(Output('dashboard1_div_mse','children'),[Input('dashboard1_slider_theta1','value'),State('data','children'),State('best_theta','children')])
+def dashboard1_div_mse(theta1,data,best_theta):
+    df = pd.read_json(data, orient='split')
+    mse = mean_squared_error(df['y'], theta1*df['X']+best_theta[0])
+    
+    return [html.H3('MSE'),f'{mse:.2f}']
+
+@app.callback(Output('dashboard1_graph_regression','figure'),[Input('dashboard1_slider_theta1','value'),Input('dashboard1_checklist_residuals','value'),State('data','children'), State('best_theta','children')])
+def dashboard1_graph_regression(theta1, residuals_switch, data, best_theta):
+    df = pd.read_json(data, orient='split')
+    
+    fig = go.Figure(
+        data=[
+            go.Scatter(x=df['X'],y=df['y'],mode='markers',marker=dict(color='firebrick'),name='Data', hovertemplate='(%{x:.2f}, %{y:.2f})'),
+            go.Scatter(x=df['X'],y=theta1*df['X']+best_theta[0],mode='lines',line=dict(color='royalblue'),name='Prediction', hovertemplate='(%{x:.2f}, %{y:.2f})')
+        ],
+        layout = go.Layout(
+            yaxis = dict(
+                mirror=True,
+                zeroline=True,
+                zerolinewidth=2,
+                zerolinecolor="lightgrey",
+                gridcolor="lightgrey",
+                title='y',
+                range = [0,13.5]
+            ),
+            xaxis = dict(
+                mirror=True,
+                zeroline=True,
+                zerolinewidth=2,
+                zerolinecolor="lightgrey",
+                gridcolor="lightgrey",
+                title='X',
+                range = [0,2]
+            ),
+            margin=dict(t=5,b=5,l=5,r=5),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            showlegend=True,
+            legend=dict(
+                bgcolor="rgba(176,196,222,0.9)",
+                yanchor="top",
+                y=0.99,
+                xanchor="left",
+                x=0.01,
+            ),
+        )
+    )
+    
+    if residuals_switch != []:
+        preds = theta1*df['X']+best_theta[0]
+        residuals = df['y'] - preds
+        for i, r in enumerate(residuals):
+            fig.add_trace(
+                go.Scatter(
+                    x=[df['X'][i], df['X'][i]],
+                    y=[preds[i], preds[i] + r],
+                    line=dict(color="firebrick", width=1, dash="dash"),
+                    name=f'Residual {i+1}',
+                    showlegend=False,
+                    hovertemplate='(%{x:.2f}, %{y:.2f})'
+                )
+            )
+        
+        fig.add_trace(
+            go.Scatter(
+                x=[-100, -100],
+                y=[-100, -100],
+                name="Residuals",
+                line=dict(color="firebrick", width=1, dash="dash"),
+            )
+        )
+    
+    return fig
+
+@app.callback(Output('dashboard2_div_mse','children'),[Input('dashboard2_div_theta1init','children'),Input('dashboard2_div_theta1hist','children'), State('data','children'), State('best_theta','children')])
+def dashboard2_div_mse(theta1_init, theta1_hist, data, best_theta):
     df = pd.read_json(data, orient='split')
     ctx = dash.callback_context
     
@@ -27,17 +115,17 @@ def example3_div_mse(theta1_init, theta1_hist, data, best_theta):
     return [html.H3('MSE'),f'{mse:.2f}']
     
 @app.callback(
-    [Output('example3_div_theta1init','children'),
-    Output('example3_input_eta','value')],
-    [Input('example3_button_reset','n_clicks'),
-     Input('example3_href_li1','n_clicks'),
-     Input('example3_href_li2','n_clicks'),
-     Input('example3_href_li3','n_clicks'),
-     Input('example3_href_li4','n_clicks'),
+    [Output('dashboard2_div_theta1init','children'),
+    Output('dashboard2_input_eta','value')],
+    [Input('dashboard2_button_reset','n_clicks'),
+     Input('dashboard2_href_li1','n_clicks'),
+     Input('dashboard2_href_li2','n_clicks'),
+     Input('dashboard2_href_li3','n_clicks'),
+     Input('dashboard2_href_li4','n_clicks'),
      State('best_theta','children'),
-     State('example3_input_eta','value')]
+     State('dashboard2_input_eta','value')]
      )
-def example3_theta1init(n_clicks,li1,li2,li3,li4,best_theta,eta):
+def dashboard2_theta1init(n_clicks,li1,li2,li3,li4,best_theta,eta):
     ctx = dash.callback_context.triggered[0]['prop_id']
     
     if 'reset' in ctx:
@@ -58,12 +146,12 @@ def example3_theta1init(n_clicks,li1,li2,li3,li4,best_theta,eta):
     return [v,eta]
 
 @app.callback(
-    Output('example3_input_eta','disabled'),
-    [Input('example3_button_reset','n_clicks'),
-     Input('example3_button_nextstep','n_clicks'),
-     Input('example3_button_nextstep_table','n_clicks')]
+    Output('dashboard2_input_eta','disabled'),
+    [Input('dashboard2_button_reset','n_clicks'),
+     Input('dashboard2_button_nextstep','n_clicks'),
+     Input('dashboard2_button_nextstep_table','n_clicks')]
 )
-def example3_input_eta(reset,nextstep,nextstep_table):
+def dashboard2_input_eta(reset,nextstep,nextstep_table):
     ctx = dash.callback_context.triggered[0]['prop_id']
     
     if 'reset' in ctx or all(v is None for v in [nextstep,nextstep_table]):
@@ -72,17 +160,17 @@ def example3_input_eta(reset,nextstep,nextstep_table):
         return True
 
 @app.callback(
-    [Output('example3_div_theta1hist','children'),
-     Output('example3_div_thetas','children')],
-    [Input('example3_button_nextstep','n_clicks'),
-     Input('example3_button_nextstep_table','n_clicks'),
-     Input('example3_div_theta1init','children'),
-     State('example3_div_theta1hist','children'),
-     State('example3_input_eta','value'),
+    [Output('dashboard2_div_theta1hist','children'),
+     Output('dashboard2_div_thetas','children')],
+    [Input('dashboard2_button_nextstep','n_clicks'),
+     Input('dashboard2_button_nextstep_table','n_clicks'),
+     Input('dashboard2_div_theta1init','children'),
+     State('dashboard2_div_theta1hist','children'),
+     State('dashboard2_input_eta','value'),
      State('best_theta','children'),
      State('data','children')]
 )
-def example3_theta1hist(n_clicks,n_clicks_table,theta1_init,theta1_hist,eta,theta_best,data):
+def dashboard2_theta1hist(n_clicks,n_clicks_table,theta1_init,theta1_hist,eta,theta_best,data):
     df = pd.read_json(data, orient='split')
     ctx = dash.callback_context.triggered[0]['prop_id']
     
@@ -94,14 +182,14 @@ def example3_theta1hist(n_clicks,n_clicks_table,theta1_init,theta1_hist,eta,thet
         return [theta1_hist+[theta1_new], ['$\\theta_0=$',' ',round(theta_best[0],1),', ','$\\theta_1=$',' ',round(theta1_new,1)]]
 
 @app.callback(
-    Output('example3_table_math','children'),
-    [Input('example3_div_theta1hist','children'),
-     Input('example3_input_eta','value'),
-     State('example3_table_math','children'),
+    Output('dashboard2_table_math','children'),
+    [Input('dashboard2_div_theta1hist','children'),
+     Input('dashboard2_input_eta','value'),
+     State('dashboard2_table_math','children'),
      State('best_theta','children'),
      State('data','children')]
 )
-def example3_table_math(theta1hist, eta, table, best_theta, data):
+def dashboard2_table_math(theta1hist, eta, table, best_theta, data):
     df = pd.read_json(data, orient='split')
     theta0 = round(best_theta[0],2)
     td_style = {'text-align':'center','vertical-align':'middle','font-weight':'bold'}
@@ -148,14 +236,14 @@ def example3_table_math(theta1hist, eta, table, best_theta, data):
         return html.Tbody(trs+[tr], className='math-left-align')
 
 @app.callback(
-    Output('example3_graph_regression', 'figure'),
-    [Input('example3_div_theta1init','children'),
-     Input('example3_div_theta1hist','children'),
-     State('example3_graph_regression','figure'),
+    Output('dashboard2_graph_regression', 'figure'),
+    [Input('dashboard2_div_theta1init','children'),
+     Input('dashboard2_div_theta1hist','children'),
+     State('dashboard2_graph_regression','figure'),
      State('data','children'),
      State('best_theta','children')]
 )
-def example3_regression(theta1_init, theta1_hist, fig, data, best_theta):
+def dashboard2_regression(theta1_init, theta1_hist, fig, data, best_theta):
     df = pd.read_json(data, orient='split')
     ctx = dash.callback_context.triggered[0]['prop_id']
     
@@ -205,14 +293,14 @@ def example3_regression(theta1_init, theta1_hist, fig, data, best_theta):
         return figure
     
 @app.callback(
-    Output('example3_graph_lossfunction', 'figure'),
-    [Input('example3_div_theta1hist','children'),
-     Input('example3_div_theta1init','children'),
-     State('example3_graph_lossfunction','figure'),
+    Output('dashboard2_graph_lossfunction', 'figure'),
+    [Input('dashboard2_div_theta1hist','children'),
+     Input('dashboard2_div_theta1init','children'),
+     State('dashboard2_graph_lossfunction','figure'),
      State('data','children'),
      State('best_theta','children')]
 )
-def example3_lossfunction(theta1_hist, theta1_init, fig, data, best_theta):
+def dashboard2_lossfunction(theta1_hist, theta1_init, fig, data, best_theta):
     df = pd.read_json(data, orient='split')
     ctx = dash.callback_context.triggered[0]['prop_id']
     

@@ -25,19 +25,19 @@ section1_layout = html.Div([
             [
                 dbc.Col([
                     html.Div([
-                        html.Div(id='example1_div_mse', style={'padding-bottom':'2rem', 'text-align':'center'}),
+                        html.Div(id='dashboard1_div_mse', style={'padding-bottom':'2rem', 'text-align':'center'}),
                         html.Div([
-                            html.P(id='example1_p_theta1', style={'margin-bottom':'0px'}),
-                            dcc.Slider(id='example1_slider_theta1', min=-10, max=10, step=0.1, value=1),
+                            html.P(id='dashboard1_p_theta1', style={'margin-bottom':'0px'}),
+                            dcc.Slider(id='dashboard1_slider_theta1', min=-10, max=10, step=0.1, value=1),
                         ], style={'text-align':'center'}),
                         html.Div([
-                                dbc.Button("Best fit", color='secondary', id='example1_button_bestfit'),
+                                dbc.Button("Best fit", color='secondary', id='dashboard1_button_bestfit'),
                                 dbc.Checklist(
                                     options=[
                                         {"label": "Residuals", "value": 1},
                                     ],
                                     value=[],
-                                    id="example1_checklist_residuals",
+                                    id="dashboard1_checklist_residuals",
                                     switch=True,
                                     style={'padding-left':2}
                                 ),
@@ -45,7 +45,7 @@ section1_layout = html.Div([
                     ]),
                 ], width=12, lg=2, sm=12, className='d-flex align-items-center justify-content-center container'),
                 dbc.Col([
-                    html.Div(dcc.Graph(id='example1_graph_regression')),
+                    html.Div(dcc.Graph(id='dashboard1_graph_regression')),
                 ], width=12, lg=10, sm=12)
             ],
         ),
@@ -71,24 +71,24 @@ section1_layout = html.Div([
         dbc.Row([
             dbc.Col([
                 html.Div([
-                    html.Div(id='example3_div_mse', className='pb-2'),
-                    html.Div(id='example3_div_thetas', className='pb-2'),
+                    html.Div(id='dashboard2_div_mse', className='pb-2'),
+                    html.Div(id='dashboard2_div_thetas', className='pb-2'),
                     dbc.ButtonGroup([
-                        dbc.Button(id='example3_button_nextstep', color='secondary', children='Next step'),
-                        dbc.Button(id='example3_button_reset', color='secondary', children='Reset'),
-                        dbc.Input(id="example3_input_eta", type="number", placeholder="Learning rate $\eta$", value=0.1, step=0.1),
+                        dbc.Button(id='dashboard2_button_nextstep', color='secondary', children='Next step'),
+                        dbc.Button(id='dashboard2_button_reset', color='secondary', children='Reset'),
+                        dbc.Input(id="dashboard2_input_eta", type="number", placeholder="Learning rate $\eta$", value=0.1, step=0.1),
                     ], vertical=True),
                 ], style={'text-align':'center'}),
             ], xs=12, sm=12, md=12, lg=2, className='d-flex align-items-center justify-content-center container'),
             dbc.Col([
-                html.Div(dcc.Graph(id='example3_graph_regression')),
+                html.Div(dcc.Graph(id='dashboard2_graph_regression')),
             ], xs=12, sm=12, md=12, lg=5),
             dbc.Col([
-                html.Div(dcc.Graph(id='example3_graph_lossfunction')),
+                html.Div(dcc.Graph(id='dashboard2_graph_lossfunction')),
             ], xs=12, sm=12, md=12, lg=5),
         ]),
-        html.Div(id='example3_div_theta1init', style={'display': 'none'}),
-        html.Div(id='example3_div_theta1hist', style={'display': 'none'}),
+        html.Div(id='dashboard2_div_theta1init', style={'display': 'none'}),
+        html.Div(id='dashboard2_div_theta1hist', style={'display': 'none'}),
     ], xs=12, sm=12, md=12, lg=12, className='bs-component', id='interactive1'),
     dbc.Col([
         html.P("""
@@ -96,19 +96,19 @@ section1_layout = html.Div([
         """),
         html.Ul([
             html.Li([
-                html.A('High learning rate, slow convergence ($\\theta_1=4.9, \\eta=1.5$):', href="#interactive1", id="example3_href_li1", style={"color": "blue", "font-weight": "bold",}),
+                html.A('High learning rate, slow convergence ($\\theta_1=4.9, \\eta=1.5$):', href="#interactive1", id="dashboard2_href_li1", style={"color": "blue", "font-weight": "bold",}),
                 html.P('A higher learning rate does not mean that the algorithm converges faster. The algorithm may not converge at all, or it may take more iterations while bouncing around the optimal solution.')
             ]),
             html.Li([
-                html.A('High learning rate, no convergence ($\\theta_1=1.8, \\eta=2$):', href="#interactive1", id="example3_href_li2", style={"color": "blue", "font-weight": "bold",}),
+                html.A('High learning rate, no convergence ($\\theta_1=1.8, \\eta=2$):', href="#interactive1", id="dashboard2_href_li2", style={"color": "blue", "font-weight": "bold",}),
                 html.P('Sometimes gradient descent is just very motivated, shooting past the optimal $\\theta_1$ and deviating from the best solution with each successive step.')
             ]),
             html.Li([
-                html.A('Low learning rate, slow convergence ($\\theta_1=-1, \\eta=0.05$):', href="#interactive1", id="example3_href_li3", style={"color": "blue", "font-weight": "bold",}),
+                html.A('Low learning rate, slow convergence ($\\theta_1=-1, \\eta=0.05$):', href="#interactive1", id="dashboard2_href_li3", style={"color": "blue", "font-weight": "bold",}),
                 html.P('Gradient descent is guaranteed to converge if your cost function is convex and the learning rate is small enough. That is, as you decrease the learning rate, the time to convergence also increases, since each update is just a baby step. Expect some waiting time if your random initialization is far from the optimal solution and the learning rate is too low.')
             ]),
             html.Li([
-                html.A('Good learning rate, fast convergence ($\\theta_1=7.5, \\eta=0.4$):', href="#interactive1", id="example3_href_li4", style={"color": "blue", "font-weight": "bold",}),
+                html.A('Good learning rate, fast convergence ($\\theta_1=7.5, \\eta=0.4$):', href="#interactive1", id="dashboard2_href_li4", style={"color": "blue", "font-weight": "bold",}),
                 html.P('As you can see, the sweet spot is somewhere in the middle. Just a few iterations are enough to get very close to the optimal solution. The left graph is really close to the best fit, while the gradient is close to zero, as we can see from the flat red line in the right graph.')
             ]),
         ]),
@@ -118,9 +118,9 @@ section1_layout = html.Div([
     ], xs=12, sm=12, md=12, lg=8, className='bs-component center'),
     dbc.Col([
         dbc.Col([
-            dbc.Table(id='example3_table_math', bordered=False),
+            dbc.Table(id='dashboard2_table_math', bordered=False),
         ], xs=12, sm=12, md=12, lg=6, style={'margin-left':'auto', 'margin-right':'auto', 'overflow-x':'scroll'}),
-        html.Div(dbc.Button(id='example3_button_nextstep_table', color='secondary', children='Next step'), className='pt-1', style={'text-align':'center'}),
+        html.Div(dbc.Button(id='dashboard2_button_nextstep_table', color='secondary', children='Next step'), className='pt-1', style={'text-align':'center'}),
     ], xs=12, sm=12, md=12, lg=12, className='bs-component'),
     dbc.Col([
         html.P("""
