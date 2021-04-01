@@ -1,4 +1,5 @@
 import dash
+import os
 import sympy as sp
 import plotly.graph_objects as go
 import dash_core_components as dcc
@@ -17,6 +18,7 @@ from sklearn.metrics import mean_squared_error
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from scipy import stats
+from data import DATA_PATH
 from app import app
 
 
@@ -117,8 +119,8 @@ ranks_dict = {
 )
 def update_data(size):
     return [
-        pd.DataFrame(np.load(f'racetrack{size}.npy'),columns=['b','X','y']).to_json(orient='split'),
-        pd.DataFrame(np.load(f'contour{size}.npy')).to_json(orient='split'),
+        pd.DataFrame(np.load(os.path.join(DATA_PATH,f'racetrack{size}.npy')),columns=['b','X','y']).to_json(orient='split'),
+        pd.DataFrame(np.load(os.path.join(DATA_PATH,f'contour{size}.npy'))).to_json(orient='split'),
     ]
 
 @app.callback(
