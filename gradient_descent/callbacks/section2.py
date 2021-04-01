@@ -8,9 +8,16 @@ import dash_html_components as html
 
 from sklearn.metrics import mean_squared_error
 from dash.dependencies import Input, Output, State
+from dash.exceptions import PreventUpdate
 from util import j, djt0, djt1, z, array2matrix
 from app import app
 
+
+def eta_check(eta, min, max):
+    if eta is None or not min<=eta<=max:
+        return False
+    else:
+        return True
 
 @app.callback(Output('dashboard3_p_theta0','children'),Input('dashboard3_slider_theta0','value'))
 def p_theta0_dashboard3(theta0):
@@ -192,6 +199,9 @@ def example3_input_eta(reset,nextstep,nextstep_table,scalex):
      State('data_scaled','children')]
 )
 def dashboard4_thetahist(n_clicks,n_clicks_table,theta_init,scalex,theta_hist,eta,data,data_scaled):
+    if eta_check(eta, 0, 2)==False:
+        raise PreventUpdate
+
     ctx = dash.callback_context.triggered[0]['prop_id']
     
     if ctx == '.' or 'thetainit' in ctx:
@@ -225,6 +235,9 @@ def dashboard4_thetahist(n_clicks,n_clicks_table,theta_init,scalex,theta_hist,et
      State('data_scaled','children')]
 )
 def dashboard4_table_math(thetahist, eta, table, scalex, data, data_scaled):
+    if eta_check(eta, 0, 2)==False:
+            raise PreventUpdate
+
     if scalex == [1]:
         df = pd.read_json(data_scaled, orient='split')
     else:
@@ -245,7 +258,7 @@ def dashboard4_table_math(thetahist, eta, table, scalex, data, data_scaled):
             ]),
             html.Tr([
                 html.Td('Gradient', style=td_style),
-                html.Td(f'$$\\begin{{aligned}}\\textrm{{MSE}}_{{\\theta_0}}(\\theta)&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\theta^{{T}}x^{{i}}-y^{{i}})x_{{0}}^{{i}}\\\\&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\begin{{pmatrix}}\\theta_{{0}}&\\theta_{{1}}\\end{{pmatrix}}x^{{i}}-y^{{i}})x_{{0}}^{{i}}\\end{{aligned}}$$$$\\begin{{aligned}}\\textrm{{MSE}}_{{\\theta_1}}(\\theta)&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\theta^{{T}}x^{{i}}-y^{{i}})x_{{1}}^{{i}}\\\\&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\begin{{pmatrix}}\\theta_{{0}}&\\theta_{{1}}\\end{{pmatrix}}x^{{i}}-y^{{i}})x_{{1}}^{{i}}\\end{{aligned}}$$')
+                html.Td(f'$$\\begin{{aligned}}\\frac{{\\partial}}{{\\partial{{\\theta_0}}}}\\textrm{{MSE}}(\\theta)&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\theta^{{T}}x^{{i}}-y^{{i}})x_{{0}}^{{i}}\\\\&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\begin{{pmatrix}}\\theta_{{0}}&\\theta_{{1}}\\end{{pmatrix}}x^{{i}}-y^{{i}})x_{{0}}^{{i}}\\end{{aligned}}$$$$\\begin{{aligned}}\\frac{{\\partial}}{{\\partial{{\\theta_1}}}}\\textrm{{MSE}}(\\theta)&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\theta^{{T}}x^{{i}}-y^{{i}})x_{{1}}^{{i}}\\\\&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\begin{{pmatrix}}\\theta_{{0}}&\\theta_{{1}}\\end{{pmatrix}}x^{{i}}-y^{{i}})x_{{1}}^{{i}}\\end{{aligned}}$$')
             ]),
             html.Tr([
                 html.Td('Initialization', style=td_style),
@@ -265,8 +278,8 @@ def dashboard4_table_math(thetahist, eta, table, scalex, data, data_scaled):
             [
                 html.Td(f'Step {len(df_theta)-1}', style=td_style),
                 html.Td([
-                    f'$$\\textrm{{MSE}}_{{\\theta_0}}(\\theta)=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}({array2matrix(theta_old.T)}x^{{i}}-y^{{i}})x_{{0}}^{{i}}={round(gradient0,2)}$$',
-                    f'$$\\textrm{{MSE}}_{{\\theta_1}}(\\theta)=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}({array2matrix(theta_old.T)}x^{{i}}-y^{{i}})x_{{1}}^{{i}}={round(gradient1,2)}$$',
+                    f'$$\\frac{{\\partial}}{{\\partial{{\\theta_0}}}}\\textrm{{MSE}}(\\theta)=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}({array2matrix(theta_old.T)}x^{{i}}-y^{{i}})x_{{0}}^{{i}}={round(gradient0,2)}$$',
+                    f'$$\\frac{{\\partial}}{{\\partial{{\\theta_1}}}}\\textrm{{MSE}}(\\theta)=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}({array2matrix(theta_old.T)}x^{{i}}-y^{{i}})x_{{1}}^{{i}}={round(gradient1,2)}$$',
                     f'$$\\theta_{{0}}^{{new}}=\\theta_0-\\eta\\textrm{{MSE}}_{{\\theta_0}}(\\theta)={theta0_old}-{eta}\\cdot{round(gradient0,2)}={theta0}$$',
                     f'$$\\theta_{{1}}^{{new}}=\\theta_1-\\eta\\textrm{{MSE}}_{{\\theta_1}}(\\theta)={theta1_old}-{eta}\\cdot{round(gradient1,2)}={theta1}$$',
                     f'$$\\theta={array2matrix(theta)}$$'

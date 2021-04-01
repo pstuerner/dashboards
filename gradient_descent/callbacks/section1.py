@@ -8,9 +8,16 @@ import dash_bootstrap_components as dbc
 
 from sklearn.metrics import mean_squared_error
 from dash.dependencies import Input, Output, State
+from dash.exceptions import PreventUpdate
 from util import j, djt1, array2matrix
 from app import app
 
+
+def eta_check(eta, min, max):
+    if eta is None or not min<=eta<=max:
+        return False
+    else:
+        return True
 
 @app.callback(Output('dashboard1_p_theta1','children'),Input('dashboard1_slider_theta1','value'))
 def dashboard1_p_theta0(theta1):
@@ -126,6 +133,9 @@ def dashboard2_div_mse(theta1_init, theta1_hist, data, best_theta):
      State('dashboard2_input_eta','value')]
      )
 def dashboard2_theta1init(n_clicks,li1,li2,li3,li4,best_theta,eta):
+    if eta_check(eta, 0, 2)==False:
+        raise PreventUpdate
+
     ctx = dash.callback_context.triggered[0]['prop_id']
     
     if 'reset' in ctx:
@@ -149,12 +159,13 @@ def dashboard2_theta1init(n_clicks,li1,li2,li3,li4,best_theta,eta):
     Output('dashboard2_input_eta','disabled'),
     [Input('dashboard2_button_reset','n_clicks'),
      Input('dashboard2_button_nextstep','n_clicks'),
-     Input('dashboard2_button_nextstep_table','n_clicks')]
+     Input('dashboard2_button_nextstep_table','n_clicks'),
+     State('dashboard2_input_eta','value')]
 )
-def dashboard2_input_eta(reset,nextstep,nextstep_table):
+def dashboard2_input_eta(reset,nextstep,nextstep_table,eta):
     ctx = dash.callback_context.triggered[0]['prop_id']
     
-    if 'reset' in ctx or all(v is None for v in [nextstep,nextstep_table]):
+    if 'reset' in ctx or all(v is None for v in [nextstep,nextstep_table]) or eta_check(eta, 0 ,2)==False:
         return False
     else:
         return True
@@ -171,6 +182,9 @@ def dashboard2_input_eta(reset,nextstep,nextstep_table):
      State('data','children')]
 )
 def dashboard2_theta1hist(n_clicks,n_clicks_table,theta1_init,theta1_hist,eta,theta_best,data):
+    if eta_check(eta, 0, 2)==False:
+        raise PreventUpdate
+
     df = pd.read_json(data, orient='split')
     ctx = dash.callback_context.triggered[0]['prop_id']
     
@@ -190,6 +204,9 @@ def dashboard2_theta1hist(n_clicks,n_clicks_table,theta1_init,theta1_hist,eta,th
      State('data','children')]
 )
 def dashboard2_table_math(theta1hist, eta, table, best_theta, data):
+    if eta_check(eta, 0, 2)==False:
+            raise PreventUpdate
+
     df = pd.read_json(data, orient='split')
     theta0 = round(best_theta[0],2)
     td_style = {'text-align':'center','vertical-align':'middle','font-weight':'bold'}
@@ -207,7 +224,7 @@ def dashboard2_table_math(theta1hist, eta, table, best_theta, data):
             ]),
             html.Tr([
                 html.Td('Gradient', style=td_style),
-                html.Td(f'$$\\begin{{aligned}}\\textrm{{MSE}}_{{\\theta_1}}(\\theta)&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\theta^{{T}}x^{{i}}-y^{{i}})x_{{1}}^{{i}}\\\\&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\begin{{pmatrix}}{theta0}&\\theta_{{1}}\\end{{pmatrix}}x^{{i}}-y^{{i}})x_{{1}}^{{i}}\\end{{aligned}}$$')
+                html.Td(f'$$\\begin{{aligned}}\\frac{{\\partial}}{{\\partial{{\\theta_1}}}}\\textrm{{MSE}}(\\theta)&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\theta^{{T}}x^{{i}}-y^{{i}})x_{{1}}^{{i}}\\\\&=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}(\\begin{{pmatrix}}{theta0}&\\theta_{{1}}\\end{{pmatrix}}x^{{i}}-y^{{i}})x_{{1}}^{{i}}\\end{{aligned}}$$')
             ]),
             html.Tr([
                 html.Td('Initialization', style=td_style),
@@ -227,7 +244,7 @@ def dashboard2_table_math(theta1hist, eta, table, best_theta, data):
             [
                 html.Td(f'Step {len(theta1hist)-1}', style=td_style),
                 html.Td([
-                    f'$$\\textrm{{MSE}}_{{\\theta_1}}(\\theta)=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}({array2matrix(theta.T)}x^{{i}}-y^{{i}})x_{{1}}^{{i}}={round(gradient,2)}$$',
+                    f'$$\\frac{{\\partial}}{{\\partial{{\\theta_1}}}}\\textrm{{MSE}}(\\theta)=\\frac{{1}}{{m}}\\sum_{{i=1}}^{{m}}({array2matrix(theta.T)}x^{{i}}-y^{{i}})x_{{1}}^{{i}}={round(gradient,2)}$$',
                     f'$$\\theta_{{1}}^{{new}}=\\theta_1-\\eta\\textrm{{MSE}}_{{\\theta_1}}(\\theta)={theta1_old}-{eta}\\cdot{round(gradient,2)}={theta1_new}$$',
                     f'$$\\theta={array2matrix(np.array([[theta0],[theta1_new]]))}$$'
                 

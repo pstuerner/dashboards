@@ -15,9 +15,16 @@ from functools import wraps
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 from dash.dependencies import Input, Output, State
+from dash.exceptions import PreventUpdate
 from scipy import stats
 from app import app
 
+
+def steps_check(steps, min, max):
+    if steps is None or not min<=steps<=max:
+        return False
+    else:
+        return True
 
 def recordTime(func):
     @wraps(func)
@@ -150,6 +157,9 @@ def best_theta(data):
     ]
 )
 def update_history(n_clicks, n_clicks_reset, best_theta, data, bgd_history, sgd_history, mbgd_history, n_steps, bgd_lr, sgd_lr, mbgd_lr, mbgd_batchsize):
+    if steps_check(n_steps, 1, 50)==False:
+        raise PreventUpdate
+    
     ctx = dash.callback_context.triggered[0]['prop_id']
     
     if 'best_theta' in ctx or 'reset' in ctx or ctx=='.':
@@ -217,7 +227,14 @@ def update_regression(data, bgd_history, sgd_history, mbgd_history, fig, size):
         }
         figure = go.Figure(
             data=[
-                go.Scatter(x=data['X'][:d[size]],y=data['y'][:d[size]],mode='markers',opacity=0.75,name='Data')
+                go.Scatter(
+                    x=data['X'][:d[size]],
+                    y=data['y'][:d[size]],
+                    mode='markers',
+                    opacity=0.75,
+                    name='Data',
+                    hovertemplate='(%{x:.2f}, %{y:.2f})'
+                )
             ],
             layout=go.Layout(
                 yaxis = dict(
@@ -261,13 +278,13 @@ def update_regression(data, bgd_history, sgd_history, mbgd_history, fig, size):
         figure['data'] = tuple(fdata)
 
     figure.add_trace(
-        go.Scatter(x=data['X'],y=(data[['b','X']].to_numpy().dot(last_bgd).ravel()), mode='lines', line=dict(color='red'), name='BGD'),
+        go.Scatter(x=data['X'],y=(data[['b','X']].to_numpy().dot(last_bgd).ravel()), mode='lines', line=dict(color='red'), name='BGD', hovertemplate='(%{x:.2f}, %{y:.2f})'),
     )
     figure.add_trace(
-        go.Scatter(x=data['X'],y=(data[['b','X']].to_numpy().dot(last_sgd).ravel()), mode='lines', line=dict(color='lime'), name='SGD'), 
+        go.Scatter(x=data['X'],y=(data[['b','X']].to_numpy().dot(last_sgd).ravel()), mode='lines', line=dict(color='lime'), name='SGD', hovertemplate='(%{x:.2f}, %{y:.2f})'), 
     )
     figure.add_trace(
-        go.Scatter(x=data['X'],y=(data[['b','X']].to_numpy().dot(last_mbgd)).ravel(), mode='lines', line=dict(color='gold'), name='MBGD'), 
+        go.Scatter(x=data['X'],y=(data[['b','X']].to_numpy().dot(last_mbgd)).ravel(), mode='lines', line=dict(color='gold'), name='MBGD', hovertemplate='(%{x:.2f}, %{y:.2f})'), 
     )
     
     return figure
@@ -308,7 +325,9 @@ def update_contour(data_contour, bgd_history, sgd_history, mbgd_history, fig, be
                             size = 8,
                             color = 'white',
                         ),
-                    )
+                    ),
+                    name='Cost function',
+                    hovertemplate='theta_0 = %{x:.2f}<br>theta_1 = %{y:.2f}<br>MSE cost = %{z:.2f}'
                 ),
                 go.Scatter(
                     x=[best_theta[0]],
@@ -319,7 +338,9 @@ def update_contour(data_contour, bgd_history, sgd_history, mbgd_history, fig, be
                         color='limegreen',
                         size=8
                     ),
-                    showlegend=False
+                    name='Global optimum',
+                    showlegend=False,
+                    hovertemplate='theta_0 = %{x:.2f}<br>theta_1 = %{y:.2f}'
                 ),
                 go.Scatter(
                     x=[bgd_history['theta0'].values[-1]],
@@ -330,7 +351,9 @@ def update_contour(data_contour, bgd_history, sgd_history, mbgd_history, fig, be
                         color='red',
                         size=8
                     ),
-                    showlegend=False
+                    name='Random initialization',
+                    showlegend=False,
+                    hovertemplate='theta_0 = %{x:.2f}<br>theta_1 = %{y:.2f}'
                 ),
             ],
             layout=go.Layout(
@@ -378,13 +401,13 @@ def update_contour(data_contour, bgd_history, sgd_history, mbgd_history, fig, be
         figure['data'] = tuple(fdata)
 
     figure.add_trace(
-        go.Scatter(x=bgd_history['theta0'],y=bgd_history['theta1'], name='BGD', mode='lines', line=dict(color='red'), opacity=0.8, showlegend=False)
+        go.Scatter(x=bgd_history['theta0'],y=bgd_history['theta1'], name='BGD', mode='lines', line=dict(color='red'), opacity=0.8, showlegend=False, hovertemplate='theta_0 = %{x:.2f}<br>theta_1 = %{y:.2f}')
     )
     figure.add_trace(
-        go.Scatter(x=sgd_history['theta0'],y=sgd_history['theta1'], name='SGD', mode='lines', line=dict(color='lime'), opacity=0.8, showlegend=False)
+        go.Scatter(x=sgd_history['theta0'],y=sgd_history['theta1'], name='SGD', mode='lines', line=dict(color='lime'), opacity=0.8, showlegend=False, hovertemplate='theta_0 = %{x:.2f}<br>theta_1 = %{y:.2f}')
     )
     figure.add_trace(
-        go.Scatter(x=mbgd_history['theta0'],y=mbgd_history['theta1'], name='MBGD', mode='lines', line=dict(color='gold'), opacity=0.8, showlegend=False)
+        go.Scatter(x=mbgd_history['theta0'],y=mbgd_history['theta1'], name='MBGD', mode='lines', line=dict(color='gold'), opacity=0.8, showlegend=False, hovertemplate='theta_0 = %{x:.2f}<br>theta_1 = %{y:.2f}')
     )
     
     return figure
