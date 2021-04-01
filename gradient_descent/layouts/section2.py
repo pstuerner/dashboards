@@ -14,21 +14,21 @@ section2_layout = html.Div([
             [
                 dbc.Col([
                     html.Div([
-                        html.Div(id='example2_div_mse', style={'padding-bottom':'2rem', 'text-align':'center'}),
+                        html.Div(id='dashboard3_div_mse', style={'padding-bottom':'2rem', 'text-align':'center'}),
                         html.Div([
-                            html.P(id='example2_p_theta0', style={'margin-bottom':'0px'}),
-                            dcc.Slider(id='example2_slider_theta0', min=0, max=10, step=0.1, value=1),
-                            html.P(id='example2_p_theta1', style={'margin-bottom':'0px'}),
-                            dcc.Slider(id='example2_slider_theta1', min=-10, max=10, step=0.1, value=1),
+                            html.P(id='dashboard3_p_theta0', style={'margin-bottom':'0px'}),
+                            dcc.Slider(id='dashboard3_slider_theta0', min=0, max=10, step=0.1, value=1),
+                            html.P(id='dashboard3_p_theta1', style={'margin-bottom':'0px'}),
+                            dcc.Slider(id='dashboard3_slider_theta1', min=-10, max=10, step=0.1, value=1),
                         ], style={'text-align':'center'}),
                         html.Div([
-                                dbc.Button("Best fit", color='secondary', id='example2_button_bestfit'),
+                                dbc.Button("Best fit", color='secondary', id='dashboard3_button_bestfit'),
                                 dbc.Checklist(
                                     options=[
                                         {"label": "Residuals", "value": 1},
                                     ],
                                     value=[],
-                                    id="example2_checklist_residuals",
+                                    id="dashboard3_checklist_residuals",
                                     switch=True,
                                     style={'padding-left':2}
                                 ),
@@ -36,7 +36,7 @@ section2_layout = html.Div([
                     ]),
                 ], width=12, lg=2, sm=12, className='d-flex align-items-center justify-content-center container'),
                 dbc.Col([
-                    html.Div(dcc.Graph(id='example2_graph_regression')),
+                    html.Div(dcc.Graph(id='dashboard3_graph_regression')),
                 ], width=12, lg=10, sm=12)
             ]
         ),
@@ -53,30 +53,30 @@ section2_layout = html.Div([
         dbc.Row([
             dbc.Col([
                 html.Div([
-                    html.Div(id='example4_div_mse', className='pb-3'),
-                    html.Div(id='example4_div_thetas', className='pb-3'),
+                    html.Div(id='dashboard4_div_mse', className='pb-3'),
+                    html.Div(id='dashboard4_div_thetas', className='pb-3'),
                     html.Div(
                         dbc.Checklist(
                             options=[
                                 {"label": "Scale X", "value": 1},
                             ],
                             value=[],
-                            id="example4_checklist_scalex",
+                            id="dashboard4_checklist_scalex",
                             switch=True,
                         ), style={'width':'100%'}, className='pb-2',
                     ),
                     dbc.ButtonGroup([
-                        dbc.Button(id='example4_button_nextstep', color='secondary', children='Next step'),
-                        dbc.Button(id='example4_button_reset', color='secondary', children='Reset'),
-                        dbc.Input(id="example4_input_eta", type="number", placeholder="Learning rate", value=0.1, step=0.1),
+                        dbc.Button(id='dashboard4_button_nextstep', color='secondary', children='Next step'),
+                        dbc.Button(id='dashboard4_button_reset', color='secondary', children='Reset'),
+                        dbc.Input(id="dashboard4_input_eta", type="number", placeholder="Learning rate", value=0.1, step=0.1),
                     ], vertical=True),
                 ], style={'text-align':'center'}),
             ], xs=12, sm=12, md=12, lg=2, className='d-flex align-items-center justify-content-center container'),
             dbc.Col([
-                html.Div(dcc.Graph(id='example4_graph_regression')),
+                html.Div(dcc.Graph(id='dashboard4_graph_regression')),
             ], xs=12, sm=12, md=12, lg=5),
             dbc.Col([
-                html.Div(dcc.Graph(id='example4_graph_lossfunction')),
+                html.Div(dcc.Graph(id='dashboard4_graph_lossfunction')),
             ], xs=12, sm=12, md=12, lg=5),
         ]),
     ], xs=12, sm=12, md=12, lg=12, className='bs-component center', id='interactive2'), 
@@ -92,11 +92,11 @@ section2_layout = html.Div([
         """),
         html.Ul([
             html.Li([
-                html.A('Unscaled input features ($\\theta_0=15,\\theta_1=-15,\\eta=0.5,\\textrm{scalex}=\\textrm{False}$):', href="#interactive2", id="example4_href_li1", style={"color": "blue", "font-weight": "bold",}),
+                html.A('Unscaled input features ($\\theta_0=15,\\theta_1=-15,\\eta=0.5,\\textrm{scalex}=\\textrm{False}$):', href="#interactive2", id="dashboard4_href_li1", style={"color": "blue", "font-weight": "bold",}),
                 html.P('Depending on the random initialization, gradient descent takes a complex path with many iterations.')
             ]),
             html.Li([
-                html.A('Scaled input features ($\\theta_0=15,\\theta_1=-15,\\eta=0.5,\\textrm{scalex}=\\textrm{True}$):', href="#interactive2", id="example4_href_li2", style={"color": "blue", "font-weight": "bold",}),
+                html.A('Scaled input features ($\\theta_0=15,\\theta_1=-15,\\eta=0.5,\\textrm{scalex}=\\textrm{True}$):', href="#interactive2", id="dashboard4_href_li2", style={"color": "blue", "font-weight": "bold",}),
                 html.P('Independent of the random initialization, gradient descent quickly finds its way to the global optimum.')
             ]),
         ]),
@@ -110,12 +110,12 @@ section2_layout = html.Div([
     dbc.Col([
         html.Div([
             dbc.Col([
-                dbc.Table(id='example4_table_math', bordered=False),
+                dbc.Table(id='dashboard4_table_math', bordered=False),
             ], xs=12, sm=12, md=12, lg=6, style={'margin-left':'auto', 'margin-right':'auto', 'overflow-x':'scroll'}),
         ]),
-        html.Div(dbc.Button(id='example4_button_nextstep_table', color='secondary', children='Next step'), className='pt-1', style={'text-align':'center'}),
-        html.Div(id='example4_div_thetainit', style={'display': 'none'}),
-        html.Div(id='example4_div_thetahist', style={'display': 'none'}),
+        html.Div(dbc.Button(id='dashboard4_button_nextstep_table', color='secondary', children='Next step'), className='pt-1', style={'text-align':'center'}),
+        html.Div(id='dashboard4_div_thetainit', style={'display': 'none'}),
+        html.Div(id='dashboard4_div_thetahist', style={'display': 'none'}),
     ], xs=12, sm=12, md=12, lg=12, className='bs-component center'),
     dbc.Col([
         html.P("""
